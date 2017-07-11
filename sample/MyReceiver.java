@@ -27,12 +27,10 @@ public class MyReceiver extends BroadcastReceiver {
 
             // On récupère le nom de l'utilisateur
 
-            int isText = intent.getIntExtra("isText",5);
+            int isText = intent.getIntExtra("isText", -1);
             Log.i(TAG,"isText receiver" + isText);
             prefs.edit().putInt("isText",isText).apply();
         }
-
     }
-
 }
 

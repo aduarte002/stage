@@ -174,7 +174,7 @@ public class ZXingScannerView extends BarcodeScannerView {
                                 @Override
                                 public void onSharedPreferenceChanged (SharedPreferences
                                 sharedPreferences, String key){
-                                    isText = sharedPreferences.getInt("isText",99);
+                                    isText = sharedPreferences.getInt("isText", -1);
                                     Log.i(TAG, "isText1: " + isText);
 
                                 }

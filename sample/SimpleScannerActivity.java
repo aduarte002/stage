@@ -84,7 +84,6 @@ public class SimpleScannerActivity extends BaseScannerActivity implements ZXingS
 
         prefs = getSharedPreferences("store",Context.MODE_MULTI_PROCESS);
         prefs.edit().putInt("isText",7).commit();
-
         Toast t = Toast.makeText(getApplicationContext(), "connected to OASIS", Toast.LENGTH_SHORT);
         t.show();
     }

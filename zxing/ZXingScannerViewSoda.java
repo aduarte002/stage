@@ -1,15 +1,7 @@
 package me.dm7.barcodescanner.zxing;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Rect;
-import android.hardware.Camera;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.BinaryBitmap;
@@ -23,37 +15,30 @@ import com.google.zxing.Result;
 import com.google.zxing.common.HybridBinarizer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
 import edu.umich.oasis.common.IDynamicAPI;
-import edu.umich.oasis.common.IEventChannelAPI;
 import edu.umich.oasis.common.OASISContext;
-import edu.umich.oasis.common.TaintSet;
-import me.dm7.barcodescanner.core.BarcodeScannerView;
-import me.dm7.barcodescanner.core.DisplayUtils;
-
 
 
 /**
  * Created by NATHAN on 30/06/17.
  */
 
-public class ZXingScannerViewSoda implements Parcelable{
+public class ZXingScannerViewSoda implements Parcelable {
 
-    private static final String STORE_NAME = "PresenceText";
-    private static final String KEY_NAME = "isText";
     // Tag
     private static final String TAG = "ZXing/ScannerSoda";
     private Result rawResult = null;
     private PlanarYUVLuminanceSource source = null;
-    public static final List<BarcodeFormat> ALL_FORMATS = new ArrayList<>();
-    private List<BarcodeFormat> mFormats;
+    private static final List<BarcodeFormat> ALL_FORMATS = new ArrayList<>();
     private static MultiFormatReader mMultiFormatReader;
-    public static boolean isInit = false;
-    private int turn ;
+    private static boolean isInit = false;
+
+    private String text = null;
+
     static {
 
         ALL_FORMATS.add(BarcodeFormat.AZTEC);
@@ -77,34 +62,32 @@ public class ZXingScannerViewSoda implements Parcelable{
     }
 
     public ZXingScannerViewSoda() {
-      //  Log.i(TAG, "ZXingScannerViewSoda ctor");
+        //  Log.i(TAG, "ZXingScannerViewSoda ctor");
     }
 
 
     private ZXingScannerViewSoda(Parcel in) {
 
-        // this.rawResult = (Result) in.readValue(ZXingSoda.class.getClassLoader());
+        this.text = in.readString();
     }
 
 
-
     public String Planar(byte[] data, int[] intData) {
-       // Log.i(TAG,"interieur :" + intData[0] + intData[1]+intData[2]+intData[3]);
+        // Log.i(TAG,"interieur :" + intData[0] + intData[1]+intData[2]+intData[3]);
 
         try {
             source = new PlanarYUVLuminanceSource(data, intData[0], intData[1], intData[2], intData[3],
                     intData[4], intData[5], false);
-        }catch (Exception e) {
+        } catch (Exception e) {
         }
 
-        if(!isInit) {
+        if (!isInit) {
             Map<DecodeHintType, Object> hints = new EnumMap<>(DecodeHintType.class);
             hints.put(DecodeHintType.POSSIBLE_FORMATS, ALL_FORMATS);
             mMultiFormatReader = new MultiFormatReader();
             mMultiFormatReader.setHints(hints);
             isInit = true;
         }
-
 
 
         if (source != null) {
@@ -150,24 +133,15 @@ public class ZXingScannerViewSoda implements Parcelable{
         if (rawResult == null) {
 
 
-            //IDynamicAPI setter = (IDynamicAPI)OASISContext.getInstance().getTrustedAPI("setter");
-
-           // setter.invoke("sharedPrefs", "store",0);
-            return null;
-        }
-        else {
-
             IDynamicAPI setter = (IDynamicAPI)OASISContext.getInstance().getTrustedAPI("setter");
-            if (turn == 0) {
-                setter.invoke("sharedPrefs", "isText", 1);
-                turn = 1;
-            }
-            else {
-                setter.invoke("sharedPrefs", "isText", 2);
-                turn = 0;
-            }
-            return rawResult.getText();
 
+            setter.invoke("sharedPrefs", "isText", 0);
+            return null;
+        } else {
+
+            IDynamicAPI setter = (IDynamicAPI) OASISContext.getInstance().getTrustedAPI("setter");
+            setter.invoke("sharedPrefs", "isText", 1);
+            return rawResult.getText();
 
         }
     }
@@ -179,7 +153,7 @@ public class ZXingScannerViewSoda implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-
+        parcel.writeString(text);
     }
 
 
